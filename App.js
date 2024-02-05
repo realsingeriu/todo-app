@@ -28,6 +28,7 @@ export default function App() {
       working: working,
       scheduledTime: scheduledTime,
       timestamp: new Date().toLocaleString(),
+      completed: false,
     };
 
     const newTodos = [...toDos, newTodo];
@@ -58,6 +59,20 @@ export default function App() {
       console.log(e);
     }
   };
+  // 삭제하기
+  const deleteTodo = (id) => {
+    const newTodos = toDos.filter((todo) => todo.id !== id);
+    setToDos(newTodos);
+    saveToDos(newTodos);
+  };
+  // 완료하기
+  const completeTodo = (id) => {
+    const updatedTodos = toDos.map((todo) =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    );
+    setToDos(updatedTodos);
+    saveToDos(updatedTodos);
+  };
 
   return (
     <View style={styles.container}>
@@ -81,7 +96,7 @@ export default function App() {
           </Text>
         </TouchableOpacity>
       </View>
-      <View>
+      <View style={styles.content}>
         <TextInput
           onSubmitEditing={addTodo}
           returnKeyLabel="완료"
@@ -98,7 +113,7 @@ export default function App() {
           placeholder="예약 시간"
           style={styles.input}
         />
-        <ScrollView>
+        <ScrollView style={styles.scrollView}>
           {toDos.map((todo) => {
             return todo.working === working ? (
               <View style={styles.toDo} key={todo.id}>
@@ -109,6 +124,28 @@ export default function App() {
                 <Text style={{ color: "white", fontSize: 14 }}>
                   타임 스탬프: {todo.timestamp}
                 </Text>
+                <TouchableOpacity
+                  onPress={() => completeTodo(todo.id)}
+                  style={{
+                    marginLeft: "auto",
+                    marginRight: 10,
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: todo.completed ? "green" : "green",
+                      fontWeight: todo.completed ? "bold" : "normal",
+                    }}
+                  >
+                    {todo.completed ? "완료" : "미완료"}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => deleteTodo(todo.id)}
+                  style={{ marginLeft: "auto" }}
+                >
+                  <Text>❌</Text>
+                </TouchableOpacity>
               </View>
             ) : null;
           })}
@@ -149,10 +186,19 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderRadius: 15,
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
   },
   toDoText: {
     color: "white",
     fontSize: 16,
     fontWeight: "500",
+  },
+  content: {
+    flex: 1,
+  },
+  scrollView: {
+    flexGrow: 1,
   },
 });
