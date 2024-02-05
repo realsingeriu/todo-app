@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() {
   const [working, setWorking] = useState(true);
@@ -16,18 +17,46 @@ export default function App() {
   const work = () => setWorking(true);
   const [text, setText] = useState("");
   const onChangText = (payload) => setText(payload);
+  const [scheduledTime, setScheduledTime] = useState(""); // 스케줄 시간 설정
   const [toDos, setToDos] = useState([]);
 
   const addTodo = () => {
-    if (text === "") return;
+    if (text === "" || scheduledTime === "") return;
     const newTodo = {
       id: Date.now(),
       text: text,
       working: working,
+      scheduledTime: scheduledTime,
+      timestamp: new Date().toLocaleString(),
     };
-    setToDos((prev) => [...prev, newTodo]);
-    setText(""); // 입력창 공백
-    // console.log(toDos);
+
+    const newTodos = [...toDos, newTodo];
+
+    setToDos(newTodos);
+    saveToDos(newTodos);
+
+    setText("");
+    setScheduledTime("");
+  };
+  useEffect(() => {
+    loadToDos();
+  }, []);
+  // 처음 시작시 저장된 할일들 가져오기
+  const loadToDos = async () => {
+    try {
+      const s = await AsyncStorage.getItem("my-todos");
+      setToDos(s != null ? JSON.parse(s) : []);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  // 저장하기
+  const saveToDos = async (toSave) => {
+    try {
+      await AsyncStorage.setItem("my-todos", JSON.stringify(toSave));
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
@@ -61,12 +90,28 @@ export default function App() {
           placeholder={working ? "할일 추가" : "어디로 여행 갈까요?"}
           style={styles.input}
         />
+        <TextInput
+          onSubmitEditing={addTodo}
+          returnKeyLabel="완료"
+          onChangeText={(payload) => setScheduledTime(payload)}
+          value={scheduledTime}
+          placeholder="예약 시간"
+          style={styles.input}
+        />
         <ScrollView>
-          {toDos.map((todo) => (
-            <View style={styles.toDo} key={todo.id}>
-              <Text style={styles.toDoText}>{todo.text}</Text>
-            </View>
-          ))}
+          {toDos.map((todo) => {
+            return todo.working === working ? (
+              <View style={styles.toDo} key={todo.id}>
+                <Text style={styles.toDoText}>{todo.text}</Text>
+                <Text style={{ color: "white", fontSize: 16 }}>
+                  예약 시간: {todo.scheduledTime}
+                </Text>
+                <Text style={{ color: "white", fontSize: 14 }}>
+                  타임 스탬프: {todo.timestamp}
+                </Text>
+              </View>
+            ) : null;
+          })}
         </ScrollView>
       </View>
     </View>
