@@ -102,7 +102,7 @@ export default function App() {
           {toDos.map((todo) => {
             return todo.working === working ? (
               <View style={styles.toDo} key={todo.id}>
-                <Text style={styles.toDoText}>{todo.text}</Text>
+                <Text style={styles.toDoText}>할일: {todo.text}</Text>
                 <Text style={{ color: "white", fontSize: 16 }}>
                   예약 시간: {todo.scheduledTime}
                 </Text>
