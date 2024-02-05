@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { theme } from "./color";
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -25,7 +26,7 @@ export default function App() {
       working: working,
     };
     setToDos((prev) => [...prev, newTodo]);
-    setText("");
+    setText(""); // 입력창 공백
     // console.log(toDos);
   };
 
@@ -60,6 +61,13 @@ export default function App() {
           placeholder={working ? "할일 추가" : "어디로 여행 갈까요?"}
           style={styles.input}
         />
+        <ScrollView>
+          {toDos.map((todo) => (
+            <View style={styles.toDo} key={todo.id}>
+              <Text style={styles.toDoText}>{todo.text}</Text>
+            </View>
+          ))}
+        </ScrollView>
       </View>
     </View>
   );
@@ -85,8 +93,21 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingVertical: 15,
     paddingHorizontal: 20,
+    marginVertical: 20,
     borderRadius: 30,
     marginTop: 20,
     fontSize: 18,
+  },
+  toDo: {
+    backgroundColor: theme.grey,
+    marginBottom: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    borderRadius: 15,
+  },
+  toDoText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });
