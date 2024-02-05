@@ -15,6 +15,20 @@ export default function App() {
   const work = () => setWorking(true);
   const [text, setText] = useState("");
   const onChangText = (payload) => setText(payload);
+  const [toDos, setToDos] = useState([]);
+
+  const addTodo = () => {
+    if (text === "") return;
+    const newTodo = {
+      id: Date.now(),
+      text: text,
+      working: working,
+    };
+    setToDos((prev) => [...prev, newTodo]);
+    setText("");
+    // console.log(toDos);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
@@ -39,6 +53,8 @@ export default function App() {
       </View>
       <View>
         <TextInput
+          onSubmitEditing={addTodo}
+          returnKeyLabel="완료"
           onChangeText={onChangText}
           value={text}
           placeholder={working ? "할일 추가" : "어디로 여행 갈까요?"}
